@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -eu
+
 export MAGICK_THREAD_LIMIT=1 MAGICK_MEMORY_LIMIT=256MiB
 ROOT="$(dirname $(dirname $(readlink -f "$0")))"
 cd "$(dirname $(readlink -f "$1"))"

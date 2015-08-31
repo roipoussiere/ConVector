@@ -61,7 +61,7 @@ public class Canvas {
 		-Float.MAX_VALUE/2, -Float.MAX_VALUE/2,
 		Float.MAX_VALUE, Float.MAX_VALUE));
 	private boolean relative;
-	private final Path2D path = new Path2D.Float();
+	private Path2D path = new Path2D.Float();
 	private Color[] colors = {Color.BLACK, CURRENT_COLOR, CURRENT_COLOR};
 	private BasicStroke stroke = new BasicStroke(1, 0, 0, 10);
 
@@ -272,13 +272,13 @@ public class Canvas {
 		sink.setSize(width, height);
 	}
 
-	/** Fill the current path with the FILL Color.
+	/** Fill the current path with the FILL Color
 	  * @return this Graphics */
 	public Canvas fill() {
 		return draw(Mode.FILL);
 	}
 
-	/** Stroke the current path with the STROKE Color.
+	/** Stroke the current path with the STROKE Color
 	  * @return this Graphics */
 	public Canvas stroke() {
 		return draw(Mode.STROKE);
@@ -317,12 +317,20 @@ public class Canvas {
 		setStroke("width", width);
 	}
 
+	public float getStrokeWidth() {
+		return stroke.getLineWidth();
+	}
+
 	/** Set the dashing style.
 	  * @param dash an array representing the dashing pattern
 	  * @see java.awt.BasicStroke */
 	public Canvas setDashArray(final float[] dash) {
 		setStroke("dash", dash);
 		return this;
+	}
+
+	public float[] getDashArray() {
+		return stroke.getDashArray();
 	}
 
 	/** Set the dash offset.
@@ -332,11 +340,19 @@ public class Canvas {
 		setStroke("dash_phase", phase);
 	}
 
+	public float getDashOffset() {
+		return stroke.getDashPhase();
+	}
+
 	/** Changes the line cap style.
 	  * @param cap either BasicStroke.CAP_BUTT, BasicStroke.CAP_ROUND or BasicStroke.CAP_SQUARE
 	  * @see java.awt.BasicStroke */
 	public void setLineCap(final LineCap cap) {
 		setStroke("cap", cap.ordinal());
+	}
+
+	public int getLineCap() {
+		return stroke.getEndCap();
 	}
 
 	/** Changes the line join style.
@@ -346,6 +362,10 @@ public class Canvas {
 		setStroke("join", join.ordinal());
 	}
 
+	public int getLineJoin() {
+		return stroke.getLineJoin();
+	}
+
 	/** Set the limit to trim a line join when the join style is JOIN_MITER.
 	  * A line join is trimmed when the ratio of miter length to stroke width is greater than
 	  * the specified value.
@@ -353,6 +373,10 @@ public class Canvas {
 	  * @see java.awt.BasicStroke */
 	public void setMiterLimit(final float limit) {
 		setStroke("miterlimit", limit);
+	}
+
+	public float getMiterLimit() {
+		return stroke.getLineJoin();
 	}
 
 	private void setStroke(final String fieldName, final Object value) {
@@ -433,6 +457,7 @@ public class Canvas {
 		this.colors = Arrays.copyOf(that.colors, that.colors.length);
 		this.textAttrs = new HashMap<>(that.textAttrs);
 		this.path.setWindingRule(that.path.getWindingRule());
+		this.path.moveTo(that.path.getCurrentPoint().getX(), that.path.getCurrentPoint().getY());
 		this.stroke = new BasicStroke(that.stroke.getLineWidth(), that.stroke.getEndCap(),
 			that.stroke.getLineJoin(), that.stroke.getMiterLimit(),
 			that.stroke.getDashArray(), that.stroke.getDashPhase());

@@ -42,6 +42,7 @@ class SimpleOutput implements Output {
 	@Override
 	public void setSize(final double width, final double height) {
 		exporter.ratio = Math.max(width, height) / 65535;
+		exporter.ratio = 1;
 		write(exporter.header(width, height, exporter.ratio));
 	}
 

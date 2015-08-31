@@ -27,6 +27,7 @@ import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -73,6 +74,7 @@ public class PSImporter implements Importer {
 
 	private final Map<Object, Void> literals = new IdentityHashMap<>();
 	private Iterator<Object> itr;
+	private Random rng = new Random();
 
 	/** Main dictionary. */
 	private final PSDict vars = new PSDict(); {
@@ -106,7 +108,9 @@ public class PSImporter implements Importer {
 		builtin("sin", () -> stack.push((float) Math.sin(Math.toRadians(p(1)))));
 		builtin("cos", () -> stack.push((float) Math.cos(Math.toRadians(p(1)))));
 		// ceiling, floor, round, truncate, sqrt, atan, exp, ln, log
-		// rand, srand, rrand
+		builtin("rand", () -> stack.push(Math.abs((float) rng.nextInt())));
+		builtin("srand", () -> rng.setSeed((int) p()));
+		builtin("rrand", () -> stack.push(0));
 
 		// Array
 		builtin("array", () -> stack.push(literal(new Object[(int) p(1)])));
@@ -252,11 +256,21 @@ public class PSImporter implements Importer {
 		builtin("setlinejoin",   () -> g.setLineJoin(Canvas.LineJoin.values()[(int) p(1)]));
 		builtin("setlinewidth",  () -> g.setStrokeWidth(p(1)));
 		builtin("setmiterlimit", () -> g.setMiterLimit(p(1)));
+		builtin("currentlinecap",    () -> stack.push(g.getLineCap()));
+		builtin("currentlinejoin",   () -> stack.push(g.getLineJoin()));
+		builtin("currentlinewidth",  () -> stack.push(g.getStrokeWidth()));
+		builtin("currentmiterlimit", () -> stack.push(g.getMiterLimit()));
 		builtin("setdash",       () -> g.setDashArray(popArray()).setDashOffset(p(1)));
 		builtin("showpage", NOOP);
 		builtin("setrgbcolor", () -> g.setColor(Canvas.Mode.BASE, Color.color(p(3), p(), p())));
 		builtin("sethsbcolor", () -> g.setColor(Canvas.Mode.BASE, Color.hsb(p(3), p(), p())));
 		builtin("setcmykcolor", () -> substack(4).clear());
+		builtin("currentrgbcolor", () -> {
+			final Color c = g.getColor(Canvas.Mode.BASE);
+			stack.push((float) c.getRed());
+			stack.push((float) c.getGreen());
+			stack.push((float) c.getBlue());
+		});
 		builtin("setgray", () -> g.setColor(Canvas.Mode.BASE, Color.gray(p(1))));
 		builtin("clippath", () -> {
 			g.resetPath();
@@ -360,8 +374,6 @@ public class PSImporter implements Importer {
 		g = new Canvas(output);
 		final Scanner scanner = new Scanner(input, "ascii");
 		g.setSize(612, 792);
-		g.getTransform().scale(1, -1);
-		g.getTransform().translate(0, -792);
 		g.setColor(Canvas.Mode.FILL, Canvas.CURRENT_COLOR);
 		g.setColor(Canvas.Mode.STROKE, Canvas.CURRENT_COLOR);
 
@@ -376,6 +388,7 @@ public class PSImporter implements Importer {
 			} else {
 				execute(obj, false);
 			}
+			scanner.hasNext(); // for some reason this is needed
 		}
 	}
 

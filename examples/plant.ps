@@ -1,9 +1,9 @@
 %!PS
 
-/bd {bind def} bind def
+/bd {def} def
 /rng {rand 65536 mod exch mul 65536 div add} bd
-/rec {[ exch {exch 1 sub dup 0 ne 3 -1 roll {dist 0 rlineto} ifelse 1 add}
-bind /exec cvx ] cvx def} bd
+/rec {[exch {exch 1 sub dup 0 ne 3 -1 roll {dist 0 rlineto} ifelse 1 add}
+	/exec load] cvx def} bd
 /+ {angle rotate} bd
 /- {angle neg rotate} bd
 /s {currentpoint stroke moveto style gsave} bd
@@ -19,8 +19,8 @@ bind /exec cvx ] cvx def} bd
 % /angle {10 15 rng} def
 % /dist {5 5 rng} def
 % /style {
-%     .2 .15 rng 1 0 rng .4 .4 rng sethsbcolor
-%     .99 currentlinewidth mul setlinewidth
+    % .2 .15 rng 1 0 rng .4 .4 rng sethsbcolor
+    % .99 currentlinewidth mul setlinewidth
 % } def
 % s 6 X r
 
