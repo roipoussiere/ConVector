@@ -3,7 +3,7 @@ MAKEFLAGS += --no-builtin-rules --silent --keep-going --jobs 12
 convector.jar: $(shell find src -name '*.java')
 	mkdir -p tmp
 	pkill -xf 'java -ea -jar convector.jar 3434' || true
-	LANG=en_US.UTF-8 javac -classpath bin -sourcepath src -source 1.8 -d tmp $?
+	LANG=en_US.UTF-8 javac -encoding UTF-8 -classpath bin -sourcepath src -source 1.8 -d tmp $?
 	cd tmp; zip -q -r -m ../$@ *; cd ../src; zip -q ../$@ `find . -type f -not -name '*.java'`
 	rmdir tmp
 
